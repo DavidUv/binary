@@ -26,14 +26,14 @@
                 fill: blue;
             }
 
-            #grid .cell .text.one {
+            #grid .cell text.text.one {
                 pointer-events: none;
                 stroke: none;
                 fill: red;
                 font-size: 32px;
             }
 
-            #grid .cell .text.zero {
+            #grid .cell text.text.zero {
                 pointer-events: none;
                 stroke: none;
                 fill: green;
@@ -236,7 +236,7 @@
 
                 setCellText: function (cell, text) {
                     var textEl = cell.getElementsByTagName("text")[0];
-                    textEl.innerHTML = text;
+                    textEl.textContent = text;
                     if (text === '1') {
                         textEl.setAttribute("class", "text one");
                     } else if (text === '0') {
@@ -362,14 +362,14 @@
                 },
                 
                 fillGrid: function (board) {
-                    var cells = document.getElementById('grid').children;
+                    var cells = document.getElementById('grid').childNodes;
                     for(var i = 0; i < board.length; i++) {
                         BI.setCellText(cells[i], board[i]);
                     }
                 },
                 
                 clearGrid: function (board) {
-                    var cells = document.getElementById('grid').children;
+                    var cells = document.getElementById('grid').childNodes;
                     for(var i = 0; i < cells.length; i++) {
                         BI.setCellText(cells[i], '');
                     }
