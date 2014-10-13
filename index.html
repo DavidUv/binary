@@ -1,0 +1,387 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        
+        <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style type="text/css">
+
+            html,body {
+                width: 100%;
+            }
+
+
+            #grid {
+                stroke: black;
+                fill: white;
+                stroke-width: 0.5px;
+                /*position: relative;*/
+            }
+
+            #grid .cell {
+            }
+
+            #grid .cell:hover {
+                fill: blue;
+            }
+
+            #grid .cell .text.one {
+                pointer-events: none;
+                stroke: none;
+                fill: red;
+                font-size: 32px;
+            }
+
+            #grid .cell .text.zero {
+                pointer-events: none;
+                stroke: none;
+                fill: green;
+                font-size: 32px;
+            }
+
+            #controls button {
+                width: 33%;
+            }
+
+            #level-controls button {
+                width: 20%;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">Binary</a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="#">How to play</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li id="restart"><a href="#"><span class="glyphicon glyphicon-refresh"></span>Restart</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Difficulty <span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li id="easy"><a href="#">Easy</a></li>
+                    <li id="medium"><a href="#">Medium</a></li>
+                    <li id="hard"><a href="#">Hard</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+             <div class="center-block" id="level-controls">
+                <button class="pull-left btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                <button class="pull-right btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+            </div>
+
+            <svg class="center-block" id="grid" width="320" height="350"></svg>
+
+            <!--  <div id="controls">
+                <button data-token="0" class="btn btn-default">0</button>
+                <button data-token="1" class="btn btn-default">1</button>
+                <button data-token="" class="btn btn-default">CLEAR</button>
+            </div> -->
+        </div>
+
+
+
+
+        <script>
+            var BI = {
+                GRID_SIDE: 8,
+                HARD: 0.9,
+                MEDIUM: 0.85,
+                // EASY: 0.4,
+                EASY: 0.6,
+
+                selectedToken: '',
+                selectedDifficulty: null,
+                board: [],
+                fullBoard: [],
+                startBoard: [],
+                
+                init: function () {
+                    BI.selectedDifficulty = BI.EASY;
+                    BI.initGrid(BI.GRID_SIDE);
+                    BI.initControls();
+                    BI.newGame();
+                    
+                },
+                
+                initGrid: function (gridSide) {
+                    var grid = document.getElementById('grid');
+
+                    var w = grid.getAttribute("width");
+                    var h = grid.getAttribute("height");
+
+                    var l = w < h ? w : h;
+                    var cw = (~~(l / gridSide)) - 3;
+                    var ch = (~~(l / gridSide)) - 3;
+                    var y = 0;
+
+                    for(var j = 0; j < gridSide; j++) {
+                        var x = 0;
+                        for(var i = 0; i < gridSide; i++) {
+                            var cell = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                            cell.setAttribute("class", "cell");
+                            cell.setAttribute("cell-number", j*8+i);
+                            cell.onclick = BI.cellSelectionHandler;
+                            grid.appendChild(cell);
+
+                            var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                            rect.setAttribute("width", cw);
+                            rect.setAttribute("height", ch);
+                            rect.setAttribute("x", x);
+                            rect.setAttribute("y", y);
+                            cell.appendChild(rect);
+
+                            var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                            text.setAttribute("x", x + cw / 2 - 10);
+                            text.setAttribute("y", y + ch / 2 + 10);
+                            text.setAttribute("class", "text");
+                            text.innerHTML = "t";
+                            cell.appendChild(text);
+
+                            x = x + cw;
+                        }
+                        y = y + ch;
+                    }
+                },
+                
+                initControls: function () {
+                    var buttons = document.querySelectorAll("#controls>button");
+                    for(var i = 0; i < buttons.length; i++) {
+                        buttons[i].onclick = BI.controlButtonCliked;
+                    }
+                    
+                    var restartButton = document.getElementById('restart');
+                    restartButton.onclick = BI.restart;
+                    
+                    var easyButton = document.getElementById('easy');
+                    easyButton.onclick = BI.setDifficulty;
+                    var mediumButton = document.getElementById('medium');
+                    mediumButton.onclick = BI.setDifficulty;
+                    var hardButton = document.getElementById('hard');
+                    hardButton.onclick = BI.setDifficulty;
+                },
+                
+                cellSelectionHandler: function (e) {
+                    var cell = e.target.parentNode;
+                    var cellNumber = cell.attributes['cell-number'].value;
+                    if (BI.startBoard[cellNumber] !== '') return;
+
+                    // var rect = e.target;
+                    // BI.drawArc(e.target.parentNode, rect.getAttribute("x"), rect.getAttribute("y"));
+                    var cellText = BI.getCellText(cell);
+
+                    if (cellText === '') {
+                        BI.selectedToken = '0';
+                    } else if (cellText === '0') {
+                        BI.selectedToken = '1';
+                    } else {
+                        BI.selectedToken = '';
+                    }
+
+                    BI.setCellText(cell, BI.selectedToken);
+
+                    BI.board[cellNumber] = BI.selectedToken;
+
+                    // var win = BI.checkForWin(BI.board, BI.fullBoard, BI.GRID_SIDE);
+                    // if (win) {
+                    //     console.log("WIN!!!!");
+                    // }
+                },
+                
+                // drawArc: function (cell, x, y) {
+                //     x = parseInt(x);
+                //     y = parseInt(y);
+                //     var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                //     circle.setAttribute("cx", x);
+                //     circle.setAttribute("cy", y);
+                //     circle.setAttribute("r", 50);
+                //     circle.onclick = BI.circleClickHandler;
+
+                //     var ex = x - 50;
+                //     var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                //     path.setAttribute("d", "M" + x + ","
+                //                                + y
+                //                                + " v-" + 50
+                //                                + " a" + 50 + ","
+                //                                + 50 + " 90 0,0 "
+                //                                + "-" + 50 + "," + 50 + " z");
+                //     path.setAttribute("fill", "red");
+
+                //     cell.appendChild(circle);
+                //     cell.appendChild(path);
+                // },
+
+                // circleClickHandler: function (e) {
+                //     e.stopPropagation();
+                //     var cell = e.target.parentNode;
+                //     cell.removeChild(e.target);
+                // },
+
+                setCellText: function (cell, text) {
+                    var textEl = cell.getElementsByTagName("text")[0];
+                    textEl.innerHTML = text;
+                    if (text === '1') {
+                        textEl.setAttribute("class", "text one");
+                    } else if (text === '0') {
+                        textEl.setAttribute("class", "text zero");
+                    } else {
+                        textEl.setAttribute("class", "text");
+                    }
+                },
+
+                getCellText: function (cell) {
+                    var textEl = cell.getElementsByTagName("text")[0];
+                    return textEl.innerHTML;
+                },
+
+                controlButtonCliked: function (e) {
+                    BI.selectedToken = e.target.attributes['data-token'].value;
+                },
+                
+                checkForWin: function (board, fullBoard, gridSide) {
+                    var win = true;
+                    for(var i = 0; i < gridSide * gridSide; i++) {
+                        if (board[i] !== fullBoard[i]) {
+                            win = false;
+                            break;
+                        }
+                    }
+                    return win;
+                },
+                
+                setDifficulty: function (e) {
+                    var difficulty = BI.EASY;
+                    switch(e.target.id) {
+                        case 'easy':
+                        {
+                            difficulty = BI.EASY;
+                            break;
+                        }
+                        case 'medium':
+                        {
+                            difficulty = BI.MEDIUM;
+                            break;
+                        }
+                        case 'hard':
+                        {
+                            difficulty = BI.HARD;
+                            break;
+                        }
+                    }
+                    BI.selectedDifficulty = difficulty;
+                    BI.newGame();
+                },
+                
+                newGame: function () {
+                    /*
+                        fullBoard = facit
+                        startBoard = actual board to display
+                        board = "working" board. The board the player manipulates.
+                    */
+                    BI.fullBoard = BI.generateBoard(BI.GRID_SIDE);
+                    BI.startBoard = BI.generateStartBoard(BI.fullBoard);
+                    BI.clearGrid();
+                    BI.fillGrid(BI.startBoard);
+                    for (var i = 0; i < BI.startBoard.length; i++) {
+                        BI.board[i] = BI.startBoard[i];
+                    }
+                },
+                
+                restart: function () {
+                    BI.fillGrid(BI.startBoard);
+                },
+                
+                generateBoard: function (gridSide, difficulty) {
+                    var boardSize = gridSide * gridSide;
+                    var board = [];
+                    for(var i = 0; i < boardSize / 2; i++) {
+                        board[i] = '1';
+                    }
+                    for(var i = boardSize / 2; i < boardSize; i++) {
+                        board[i] = '0';
+                    }
+                    board = [
+                        "0","1","0","0","1","1","0","1",
+                        "1","0","1","0","0","1","1","0",
+                        "0","1","0","1","1","0","0","1",
+                        "1","0","1","0","1","0","1","0",
+                        "1","0","0","1","0","1","0","1",
+                        "0","1","1","0","1","0","0","1",
+                        "1","0","1","1","0","0","1","0",
+                        "0","1","0","1","0","1","1","0",
+                    ]
+                    return board;
+                },
+                
+                generateStartBoard: function (board) {
+                    var startBoard = [];
+                    for(var i = 0; i < board.length; i++) {
+                        startBoard[i] = board[i];
+                    }
+                    
+                    var numberOfCellsToRemove = board.length * (1 - BI.selectedDifficulty);
+                    
+                    var cellsToRemove = [];
+                    var i = 0;
+                    while (cellsToRemove.length < numberOfCellsToRemove) {
+                        var cellNumber = Math.floor((Math.random() * (BI.GRID_SIDE * BI.GRID_SIDE)));
+                        var alreadyRemoved = false;
+                        for (var x = 0; x < cellsToRemove.length; x++) {
+                            if (cellsToRemove[x] === cellNumber) {
+                                alreadyRemoved = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyRemoved) {
+                            cellsToRemove[i++] = cellNumber;
+                        }
+                    }
+                    
+                    for (var i = 0; i < cellsToRemove.length; i++) {
+                        var cellNumber = cellsToRemove[i];
+                        startBoard[cellNumber] = '';
+                    }
+                    return startBoard;
+                },
+                
+                fillGrid: function (board) {
+                    var cells = document.getElementById('grid').children;
+                    for(var i = 0; i < board.length; i++) {
+                        BI.setCellText(cells[i], board[i]);
+                    }
+                },
+                
+                clearGrid: function (board) {
+                    var cells = document.getElementById('grid').children;
+                    for(var i = 0; i < cells.length; i++) {
+                        BI.setCellText(cells[i], '');
+                    }
+                },
+            };
+        
+           window.addEventListener('load', BI.init, false);
+        </script>
+
+        <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    </body>
+</html>
+
