@@ -11,33 +11,21 @@
                 width: 100%;
             }
 
-
             #grid {
                 stroke: black;
                 fill: white;
                 stroke-width: 0.5px;
-                /*position: relative;*/
             }
 
             #grid .cell {
             }
 
-            #grid .cell:hover {
-                fill: blue;
-            }
-
-            #grid .cell text.text.one {
-                pointer-events: none;
-                stroke: none;
+            #grid .cell rect.red {
                 fill: red;
-                font-size: 32px;
             }
 
-            #grid .cell text.text.zero {
-                pointer-events: none;
-                stroke: none;
-                fill: green;
-                font-size: 32px;
+            #grid .cell rect.blue {
+                fill: blue;
             }
 
             #controls button {
@@ -89,15 +77,7 @@
 
             <svg class="center-block" id="grid" width="320" height="350"></svg>
 
-            <!--  <div id="controls">
-                <button data-token="0" class="btn btn-default">0</button>
-                <button data-token="1" class="btn btn-default">1</button>
-                <button data-token="" class="btn btn-default">CLEAR</button>
-            </div> -->
         </div>
-
-
-
 
         <script>
             var BI = {
@@ -152,7 +132,6 @@
                             text.setAttribute("x", x + cw / 2 - 10);
                             text.setAttribute("y", y + ch / 2 + 10);
                             text.setAttribute("class", "text");
-                            text.innerHTML = "t";
                             cell.appendChild(text);
 
                             x = x + cw;
@@ -162,11 +141,6 @@
                 },
                 
                 initControls: function () {
-                    var buttons = document.querySelectorAll("#controls>button");
-                    for(var i = 0; i < buttons.length; i++) {
-                        buttons[i].onclick = BI.controlButtonCliked;
-                    }
-                    
                     var restartButton = document.getElementById('restart');
                     restartButton.onclick = BI.restart;
                     
@@ -183,9 +157,7 @@
                     var cellNumber = cell.attributes['cell-number'].value;
                     if (BI.startBoard[cellNumber] !== '') return;
 
-                    // var rect = e.target;
-                    // BI.drawArc(e.target.parentNode, rect.getAttribute("x"), rect.getAttribute("y"));
-                    var cellText = BI.getCellText(cell);
+                    var cellText = BI.board[cellNumber];
 
                     if (cellText === '') {
                         BI.selectedToken = '0';
@@ -205,56 +177,17 @@
                     // }
                 },
                 
-                // drawArc: function (cell, x, y) {
-                //     x = parseInt(x);
-                //     y = parseInt(y);
-                //     var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                //     circle.setAttribute("cx", x);
-                //     circle.setAttribute("cy", y);
-                //     circle.setAttribute("r", 50);
-                //     circle.onclick = BI.circleClickHandler;
-
-                //     var ex = x - 50;
-                //     var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                //     path.setAttribute("d", "M" + x + ","
-                //                                + y
-                //                                + " v-" + 50
-                //                                + " a" + 50 + ","
-                //                                + 50 + " 90 0,0 "
-                //                                + "-" + 50 + "," + 50 + " z");
-                //     path.setAttribute("fill", "red");
-
-                //     cell.appendChild(circle);
-                //     cell.appendChild(path);
-                // },
-
-                // circleClickHandler: function (e) {
-                //     e.stopPropagation();
-                //     var cell = e.target.parentNode;
-                //     cell.removeChild(e.target);
-                // },
-
                 setCellText: function (cell, text) {
-                    var textEl = cell.getElementsByTagName("text")[0];
-                    textEl.textContent = text;
+                    var classId = '';
                     if (text === '1') {
-                        textEl.setAttribute("class", "text one");
+                        classId = 'red';
                     } else if (text === '0') {
-                        textEl.setAttribute("class", "text zero");
-                    } else {
-                        textEl.setAttribute("class", "text");
-                    }
+                        classId = 'blue';
+                    } 
+                    var rect = cell.getElementsByTagName("rect")[0];
+                    rect.setAttribute("class", classId);
                 },
 
-                getCellText: function (cell) {
-                    var textEl = cell.getElementsByTagName("text")[0];
-                    return textEl.textContent;
-                },
-
-                controlButtonCliked: function (e) {
-                    BI.selectedToken = e.target.attributes['data-token'].value;
-                },
-                
                 checkForWin: function (board, fullBoard, gridSide) {
                     var win = true;
                     for(var i = 0; i < gridSide * gridSide; i++) {
