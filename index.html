@@ -5,319 +5,50 @@
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="binary">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta http-equiv="cleartype" content="on">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="title" content="binary">
+        <meta name="description" content="binary - a colorful puzzel game for mobile and desktop.">
+        
+        <title>binary</title>
 
-        <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style type="text/css">
-
-            html,body {
-                width: 100%;
-            }
-
-            #grid {
-                stroke: black;
-                fill: white;
-                stroke-width: 0.5px;
-            }
-
-            #grid .cell {
-            }
-
-            #grid .cell rect.red {
-                fill: red;
-            }
-
-            #grid .cell rect.blue {
-                fill: blue;
-            }
-
-            #controls button {
-                width: 33%;
-            }
-
-            #level-controls button {
-                width: 20%;
-            }
-            
-        </style>
+        <!-- <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+        <link href="app.css" rel="stylesheet">
     </head>
     <body>
-        <nav class="navbar navbar-default" role="navigation">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">Binary</a>
+
+        <div class="container">
+            <div class="header">
+                <h1>binary</h1>
+                <div class="game-info text-center">
+                    <p>TIME: 00:12</p>
+                    <p>LEVEL: 10</p>
+                </div>
             </div>
 
-            <div class="collapse navbar-collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="#">How to play</a></li>
-              </ul>
-              <ul class="nav navbar-nav navbar-right">
-                <li id="restart"><a href="#"><span class="glyphicon glyphicon-refresh"></span>Restart</a></li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Difficulty <span class="caret"></span></a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li id="easy"><a href="#">Easy</a></li>
-                    <li id="medium"><a href="#">Medium</a></li>
-                    <li id="hard"><a href="#">Hard</a></li>
-                  </ul>
-                </li>
-              </ul>
+            <svg id="grid" width="240" height="240"></svg>
+
+            <div class="clear">
+                <a class="to-left" id="back" href="#"><span class="icon glyphicon glyphicon-chevron-left"></span>back</a>
+                <a class="to-right" id="restart" href="#"><span class="icon glyphicon glyphicon-refresh"></span>replay</a>
             </div>
-          </div>
-        </nav>
-
-        <div class="container-fluid">
-             <div class="center-block" id="level-controls">
-                <button class="pull-left btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-                <button class="pull-right btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+            <div>
+                <h3>How to play</h3>
+                Your objective is to fill the grid with 1's and 0's according to the following rules:
+                <ul>
+                    <li>Each row and column must contain an equal number of one's and zero's</li>
+                    <li>No more than two of the same number is allowed next to or below each other</li>
+                    <li>Each row and columns must be unique</li>
+                </ul>
             </div>
-
-            <svg class="center-block" id="grid" width="320" height="350"></svg>
-
         </div>
-
-        <script>
-            var BI = {
-                GRID_SIDE: 8,
-                HARD: 0.9,
-                MEDIUM: 0.85,
-                // EASY: 0.4,
-                EASY: 0.6,
-
-                selectedToken: '',
-                selectedDifficulty: null,
-                board: [],
-                fullBoard: [],
-                startBoard: [],
-                
-                init: function () {
-                    FastClick.attach(document.body);
-                    BI.selectedDifficulty = BI.EASY;
-                    BI.initGrid(BI.GRID_SIDE);
-                    BI.initControls();
-                    BI.newGame();
-                    
-                },
-                
-                initGrid: function (gridSide) {
-                    var grid = document.getElementById('grid');
-
-                    var w = grid.getAttribute("width");
-                    var h = grid.getAttribute("height");
-
-                    var l = w < h ? w : h;
-                    var cw = (~~(l / gridSide)) - 3;
-                    var ch = (~~(l / gridSide)) - 3;
-                    var y = 0;
-
-                    for(var j = 0; j < gridSide; j++) {
-                        var x = 0;
-                        for(var i = 0; i < gridSide; i++) {
-                            var cell = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                            cell.setAttribute("class", "cell");
-                            cell.setAttribute("cell-number", j*8+i);
-                            cell.onclick = BI.cellSelectionHandler;
-                            grid.appendChild(cell);
-
-                            var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                            rect.setAttribute("width", cw);
-                            rect.setAttribute("height", ch);
-                            rect.setAttribute("x", x);
-                            rect.setAttribute("y", y);
-                            cell.appendChild(rect);
-
-                            var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                            text.setAttribute("x", x + cw / 2 - 10);
-                            text.setAttribute("y", y + ch / 2 + 10);
-                            text.setAttribute("class", "text");
-                            cell.appendChild(text);
-
-                            x = x + cw;
-                        }
-                        y = y + ch;
-                    }
-                },
-                
-                initControls: function () {
-                    var restartButton = document.getElementById('restart');
-                    restartButton.onclick = BI.restart;
-                    
-                    var easyButton = document.getElementById('easy');
-                    easyButton.onclick = BI.setDifficulty;
-                    var mediumButton = document.getElementById('medium');
-                    mediumButton.onclick = BI.setDifficulty;
-                    var hardButton = document.getElementById('hard');
-                    hardButton.onclick = BI.setDifficulty;
-                },
-                
-                cellSelectionHandler: function (e) {
-                    var cell = e.target.parentNode;
-                    var cellNumber = cell.attributes['cell-number'].value;
-                    if (BI.startBoard[cellNumber] !== '') return;
-
-                    var cellText = BI.board[cellNumber];
-
-                    if (cellText === '') {
-                        BI.selectedToken = '0';
-                    } else if (cellText === '0') {
-                        BI.selectedToken = '1';
-                    } else {
-                        BI.selectedToken = '';
-                    }
-
-                    BI.setCellText(cell, BI.selectedToken);
-
-                    BI.board[cellNumber] = BI.selectedToken;
-
-                    // var win = BI.checkForWin(BI.board, BI.fullBoard, BI.GRID_SIDE);
-                    // if (win) {
-                    //     console.log("WIN!!!!");
-                    // }
-                },
-                
-                setCellText: function (cell, text) {
-                    var classId = '';
-                    if (text === '1') {
-                        classId = 'red';
-                    } else if (text === '0') {
-                        classId = 'blue';
-                    } 
-                    var rect = cell.getElementsByTagName("rect")[0];
-                    rect.setAttribute("class", classId);
-                },
-
-                checkForWin: function (board, fullBoard, gridSide) {
-                    var win = true;
-                    for(var i = 0; i < gridSide * gridSide; i++) {
-                        if (board[i] !== fullBoard[i]) {
-                            win = false;
-                            break;
-                        }
-                    }
-                    return win;
-                },
-                
-                setDifficulty: function (e) {
-                    var difficulty = BI.EASY;
-                    switch(e.target.id) {
-                        case 'easy':
-                        {
-                            difficulty = BI.EASY;
-                            break;
-                        }
-                        case 'medium':
-                        {
-                            difficulty = BI.MEDIUM;
-                            break;
-                        }
-                        case 'hard':
-                        {
-                            difficulty = BI.HARD;
-                            break;
-                        }
-                    }
-                    BI.selectedDifficulty = difficulty;
-                    BI.newGame();
-                },
-                
-                newGame: function () {
-                    /*
-                        fullBoard = facit
-                        startBoard = actual board to display
-                        board = "working" board. The board the player manipulates.
-                    */
-                    BI.fullBoard = BI.generateBoard(BI.GRID_SIDE);
-                    BI.startBoard = BI.generateStartBoard(BI.fullBoard);
-                    BI.clearGrid();
-                    BI.fillGrid(BI.startBoard);
-                    for (var i = 0; i < BI.startBoard.length; i++) {
-                        BI.board[i] = BI.startBoard[i];
-                    }
-                },
-                
-                restart: function () {
-                    BI.fillGrid(BI.startBoard);
-                },
-                
-                generateBoard: function (gridSide, difficulty) {
-                    var boardSize = gridSide * gridSide;
-                    var board = [];
-                    for(var i = 0; i < boardSize / 2; i++) {
-                        board[i] = '1';
-                    }
-                    for(var i = boardSize / 2; i < boardSize; i++) {
-                        board[i] = '0';
-                    }
-                    board = [
-                        "0","1","0","0","1","1","0","1",
-                        "1","0","1","0","0","1","1","0",
-                        "0","1","0","1","1","0","0","1",
-                        "1","0","1","0","1","0","1","0",
-                        "1","0","0","1","0","1","0","1",
-                        "0","1","1","0","1","0","0","1",
-                        "1","0","1","1","0","0","1","0",
-                        "0","1","0","1","0","1","1","0",
-                    ]
-                    return board;
-                },
-                
-                generateStartBoard: function (board) {
-                    var startBoard = [];
-                    for(var i = 0; i < board.length; i++) {
-                        startBoard[i] = board[i];
-                    }
-                    
-                    var numberOfCellsToRemove = board.length * (1 - BI.selectedDifficulty);
-                    
-                    var cellsToRemove = [];
-                    var i = 0;
-                    while (cellsToRemove.length < numberOfCellsToRemove) {
-                        var cellNumber = Math.floor((Math.random() * (BI.GRID_SIDE * BI.GRID_SIDE)));
-                        var alreadyRemoved = false;
-                        for (var x = 0; x < cellsToRemove.length; x++) {
-                            if (cellsToRemove[x] === cellNumber) {
-                                alreadyRemoved = true;
-                                break;
-                            }
-                        }
-                        if (!alreadyRemoved) {
-                            cellsToRemove[i++] = cellNumber;
-                        }
-                    }
-                    
-                    for (var i = 0; i < cellsToRemove.length; i++) {
-                        var cellNumber = cellsToRemove[i];
-                        startBoard[cellNumber] = '';
-                    }
-                    return startBoard;
-                },
-                
-                fillGrid: function (board) {
-                    var cells = document.getElementById('grid').childNodes;
-                    for(var i = 0; i < board.length; i++) {
-                        BI.setCellText(cells[i], board[i]);
-                    }
-                },
-                
-                clearGrid: function (board) {
-                    var cells = document.getElementById('grid').childNodes;
-                    for(var i = 0; i < cells.length; i++) {
-                        BI.setCellText(cells[i], '');
-                    }
-                },
-            };
-        
-           window.addEventListener('load', BI.init, false);
-        </script>
 
         <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
         <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="bower_components/fastclick/lib/fastclick.js"></script>
+        <script type="text/javascript" src="app.js"></script>
 
     </body>
 </html>
