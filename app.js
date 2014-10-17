@@ -13,8 +13,8 @@ var BI = {
     
     init: function () {
         FastClick.attach(document.body);
-        window.setTimeout(function () { widow.scrollTo(0, 1); }, 0);
-        
+        window.setTimeout(function () { window.scrollTo(0, 1); }, 0);
+
         BI.selectedDifficulty = BI.EASY;
         BI.initGrid(BI.GRID_SIDE);
         BI.initControls();
