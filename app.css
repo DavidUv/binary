@@ -12,31 +12,32 @@ html,body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: rgb(255, 255, 255);
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: black;
 }
 
 #grid {
-    border-radius: 20px;
-    border-color: black;
-    border-width: 2px;
-    border-style: solid;
-    stroke: black;
-    fill: white;
-    stroke-width: 0.5px;
 }
 
 #grid .cell {
+    fill: rgb(76, 76, 76);
 }
 
 #grid .cell rect.red {
-    fill: red;
-    fill-opacity: 0.5;
+    fill: rgb(208, 2, 27);
 }
 
 #grid .cell rect.blue {
-    fill: blue;
-    fill-opacity: 0.5;
+    fill: rgb(74, 144, 226);
+}
+
+#grid .cell rect.empty-visible {
+    fill: rgb(255, 255, 255);
+    fill: rgba(255, 255, 255, 0.9);
+}
+
+#grid .cell rect.empty-invisible {
+    visibility: hidden;
 }
 
 .icon {
@@ -44,31 +45,100 @@ html,body {
 }
 
 .container {
+    width: 320px;
     margin: 0 auto;
     text-align: center;
+    background-color: rgb(76, 76, 76);
+
 }
 
 .header {
-    /*border-bottom: 1px solid black;*/
-    margin-bottom: 20px;
-    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-top: 10px;
+    margin-bottom: 30px;
 }
 
 .header h1 {
-    font-size: 60px;
-    letter-spacing: 0.2em;
-    color: rgb(255, 0, 0);
-    color: rgba(255, 0, 0, 0.3);
-    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 22px;
+    letter-spacing: 0.15em;
+    color: red;
+    text-align: left;
     margin: 0;
-    padding: 0;
+    margin-bottom: 10px;
 }
 
 .game-info p {
+    text-align: left;
+    font-size: 78px;
+    color: white;
+    margin: 0;
+}
+
+#how-to-play {
+    color: white;
+    margin: 0 auto;
+    padding: 10px;
+    text-align: left;
+    margin-top: 20px;
+    line-height: 1.35em;
+    width: 90%;
+}
+
+#how-to-play hr {
+    width: 40%;
+    border-style: dashed;
+    margin-bottom: 20px;
+}
+
+#how-to-play h3 {
+    margin: 0;
+    margin-bottom: 8px;
+}
+
+#how-to-play ul {
+    padding-left: 16px;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+#overlay {
+    background-color: rgba(255,255,255,0.9);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+#overlay div {
+    padding-top: 200px;
+}
+
+.overlay-visible {
     display: inline;
-    font-size: 14px;
-    margin-right: 30px;
-    padding: 0;
+}
+
+.overlay-invisible {
+    display: none;
+}
+
+.button {
+    background-color: black;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    width: 60px;
+    color: white;
+    font-weight: bold;
+    vertical-align: middle;
+    margin: 0;
+    margin-right: 20px;
+    margin-left: 20px;
 }
 
 .text-left {

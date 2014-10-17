@@ -21,20 +21,21 @@
 
         <div class="container">
             <div class="header">
-                <h1>binary</h1>
+                <h1>BINARY</h1>
                 <div class="game-info text-center">
-                    <p>TIME: 00:12</p>
-                    <p>LEVEL: 10</p>
+                    <p>01:10</p>
                 </div>
             </div>
 
-            <svg id="grid" width="240" height="240"></svg>
+            <svg id="grid" width="293" height="293"></svg>
 
-            <div class="clear">
-                <a class="to-left" id="back" href="#"><span class="icon glyphicon glyphicon-chevron-left"></span>back</a>
-                <a class="to-right" id="restart" href="#"><span class="icon glyphicon glyphicon-refresh"></span>replay</a>
+            <div class="controls">
+                <a class="button" id="new" href="#"><span class="icon glyphicon glyphicon-chevron-left"></span>new</a>
+                <a class="button" id="restart" href="#"><span class="icon glyphicon glyphicon-refresh"></span>replay</a>
             </div>
-            <div>
+
+            <div id="how-to-play">
+                <hr/>
                 <h3>How to play</h3>
                 Your objective is to fill the grid with 1's and 0's according to the following rules:
                 <ul>
@@ -42,6 +43,12 @@
                     <li>No more than two of the same number is allowed next to or below each other</li>
                     <li>Each row and columns must be unique</li>
                 </ul>
+            </div>
+            <div id="overlay" class="overlay-invisible">
+                <div>
+                    <h3>Solved!</h3>
+                    <a class="button" id="next" href="#"><span class="icon glyphicon glyphicon-chevron-left"></span>Give me a new puzzle</a>
+                </div>
             </div>
         </div>
 

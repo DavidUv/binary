@@ -3,7 +3,7 @@ var BI = {
     HARD: 0.9,
     MEDIUM: 0.85,
     // EASY: 0.4,
-    EASY: 0.6,
+    EASY: 0.99,
 
     selectedToken: '',
     selectedDifficulty: null,
@@ -26,9 +26,12 @@ var BI = {
         var w = grid.getAttribute("width");
         var h = grid.getAttribute("height");
 
-        var l = w < h ? w : h;
-        var cw = (~~(l / gridSide));
-        var ch = (~~(l / gridSide));
+        var xPadding = 6;
+        var yPadding = 6;
+        w = w - (xPadding * gridSide);
+        h = h - (yPadding * gridSide);
+        var cw = (~~(w / gridSide));
+        var ch = (~~(h / gridSide));
         var y = 0;
 
         for(var j = 0; j < gridSide; j++) {
@@ -40,16 +43,24 @@ var BI = {
                 cell.onclick = BI.cellSelectionHandler;
                 grid.appendChild(cell);
 
-                var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                rect.setAttribute("width", cw);
-                rect.setAttribute("height", ch);
-                rect.setAttribute("x", x);
-                rect.setAttribute("y", y);
-                cell.appendChild(rect);
+                var outerRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                outerRect.setAttribute("width", cw);
+                outerRect.setAttribute("height", ch);
+                outerRect.setAttribute("x", x);
+                outerRect.setAttribute("y", y);
+                cell.appendChild(outerRect);
 
-                x = x + cw;
+                var innerRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                innerRect.setAttribute("class", "empty-visible");
+                innerRect.setAttribute("width", cw / 4);
+                innerRect.setAttribute("height", ch / 4);
+                innerRect.setAttribute("x", x + cw / 2.8);
+                innerRect.setAttribute("y", y + ch / 2.5);
+                cell.appendChild(innerRect);
+
+                x = x + cw + xPadding;
             }
-            y = y + ch;
+            y = y + ch + yPadding;
         }
     },
     
@@ -68,6 +79,7 @@ var BI = {
     cellSelectionHandler: function (e) {
         var cell = e.target.parentNode;
         var cellNumber = cell.attributes['cell-number'].value;
+
         if (BI.startBoard[cellNumber] !== '') return;
 
         var cellText = BI.board[cellNumber];
@@ -84,21 +96,40 @@ var BI = {
 
         BI.board[cellNumber] = BI.selectedToken;
 
-        // var win = BI.checkForWin(BI.board, BI.fullBoard, BI.GRID_SIDE);
-        // if (win) {
-        //     console.log("WIN!!!!");
-        // }
+        var win = BI.checkForWin(BI.board, BI.fullBoard, BI.GRID_SIDE);
+        if (win) {
+            console.log("completed!!!!");
+            window.setTimeout(function () {
+                BI.showCompletedOverlay();
+            }, 800);
+        }
     },
     
+    showCompletedOverlay: function () {
+        var overlay = document.getElementById("overlay");
+        overlay.setAttribute("class", "overlay-visible");
+
+        var button = document.getElementById("next");
+        button.onclick = function () {
+            overlay.setAttribute("class", "overlay-invisible");
+        }
+    },
+
     setCellText: function (cell, text) {
+        var outerRect = cell.getElementsByTagName("rect")[0];
+        var innerRect = cell.getElementsByTagName("rect")[1];
+
+        innerRect.setAttribute("class", "empty-invisible");
+
         var classId = '';
         if (text === '1') {
             classId = 'red';
         } else if (text === '0') {
             classId = 'blue';
-        } 
-        var rect = cell.getElementsByTagName("rect")[0];
-        rect.setAttribute("class", classId);
+        } else {
+            innerRect.setAttribute("class", "empty-visible");
+        }
+        outerRect.setAttribute("class", classId);
     },
 
     checkForWin: function (board, fullBoard, gridSide) {
