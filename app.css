@@ -12,15 +12,17 @@ html,body {
     width: 100%;
     margin: 0;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: black;
+    font-family: 'Open Sans', 'Lucida Grande', Arial, Helvetica, sans-serif;
+    /*background-color: rgb(76, 76, 76);*/
+    background-color: white;
+    color: black;
 }
 
 #grid {
 }
 
 #grid .cell {
-    fill: rgb(76, 76, 76);
+    fill: white;
 }
 
 #grid .cell rect.red {
@@ -32,8 +34,8 @@ html,body {
 }
 
 #grid .cell rect.empty-visible {
-    fill: rgb(255, 255, 255);
-    fill: rgba(255, 255, 255, 0.9);
+    fill: rgb(0, 0, 0);
+    fill: rgba(0, 0, 0, 0.9);
 }
 
 #grid .cell rect.empty-invisible {
@@ -48,41 +50,42 @@ html,body {
     width: 320px;
     margin: 0 auto;
     text-align: center;
-    background-color: rgb(76, 76, 76);
-
 }
 
 .header {
     padding-left: 10px;
     padding-top: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    float: left;
 }
 
 .header h1 {
     font-weight: bold;
-    font-size: 22px;
+    font-size: 32px;
     letter-spacing: 0.15em;
     color: red;
     text-align: left;
     margin: 0;
-    margin-bottom: 10px;
 }
 
 .game-info p {
     text-align: left;
-    font-size: 78px;
-    color: white;
+    font-size: 52px;
+    letter-spacing: 0em;
     margin: 0;
 }
 
 #how-to-play {
-    color: white;
     margin: 0 auto;
-    padding: 10px;
+    margin-top: 16px;
     text-align: left;
-    margin-top: 20px;
     line-height: 1.35em;
     width: 90%;
+}
+
+#how-to-play em {
+    font-weight: bold;
+    font-style: normal;
 }
 
 #how-to-play hr {
@@ -94,14 +97,21 @@ html,body {
 #how-to-play h3 {
     margin: 0;
     margin-bottom: 8px;
+    font-size: 22px;
 }
 
 #how-to-play ul {
     padding-left: 16px;
+    padding-bottom: 5px;
+}
+
+#how-to-play ul > li {
+    padding-bottom: 5px;
 }
 
 .controls {
-    margin-top: 20px;
+    padding-top: 12px;
+    padding-right: 12px;
 }
 
 #overlay {
@@ -125,20 +135,38 @@ html,body {
     display: none;
 }
 
-.button {
+.footer {
     background-color: black;
-    padding: 10px;
-    border-radius: 4px;
-    text-align: center;
-    cursor: pointer;
-    text-decoration: none;
-    width: 60px;
+    border-top: 1px solid black;
     color: white;
-    font-weight: bold;
-    vertical-align: middle;
+    font-size: 12px;
+    padding: 20px;
+}
+
+.footer em {
+    font-size: 18px;
+    padding: 5px;
+}
+
+.button {
+    border-radius: 4px;
+    border: 2px solid black;
+    cursor: pointer;
+    width: 70px;
+    height: 40px;
     margin: 0;
-    margin-right: 20px;
-    margin-left: 20px;
+    margin-bottom: 5px;
+    margin-right: 12px;
+    float: right;
+    text-decoration: none;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    line-height: 40px;
+    vertical-align: top;
+    font-weight: bold;
+    clear: right;
+    font-size: 18px;
 }
 
 .text-left {

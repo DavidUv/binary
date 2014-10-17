@@ -3,7 +3,7 @@ var BI = {
     HARD: 0.9,
     MEDIUM: 0.85,
     // EASY: 0.4,
-    EASY: 0.40,
+    EASY: 0.4,
 
     selectedToken: '',
     selectedDifficulty: null,
@@ -69,7 +69,10 @@ var BI = {
     initControls: function () {
         var restartButton = document.getElementById('restart');
         restartButton.onclick = BI.restart;
-        
+
+        var newGameButton = document.getElementById('new');
+        newGameButton.onclick = BI.newGame;
+
         // var easyButton = document.getElementById('easy');
         // easyButton.onclick = BI.setDifficulty;
         // var mediumButton = document.getElementById('medium');
@@ -114,7 +117,7 @@ var BI = {
         var button = document.getElementById("next");
         button.onclick = function () {
             overlay.setAttribute("class", "overlay-invisible");
-        }
+        };
     },
 
     setCellText: function (cell, text) {
@@ -174,7 +177,7 @@ var BI = {
             startBoard = actual board to display
             board = "working" board. The board the player manipulates.
         */
-        BI.fullBoard = BI.generateBoard(BI.GRID_SIDE);
+        BI.fullBoard = BI.generateBoard(BI.GRID_SIDE).next();
         BI.startBoard = BI.generateStartBoard(BI.fullBoard);
         BI.clearGrid();
         BI.fillGrid(BI.startBoard);
@@ -188,25 +191,27 @@ var BI = {
     },
     
     generateBoard: function (gridSide, difficulty) {
-        var boardSize = gridSide * gridSide;
-        var board = [];
-        for(var i = 0; i < boardSize / 2; i++) {
-            board[i] = '1';
-        }
-        for(var i = boardSize / 2; i < boardSize; i++) {
-            board[i] = '0';
-        }
-        board = [
-            "0","1","0","0","1","1","0","1",
+        var currentBoard = 0;
+        var boards = [
+            ["0","1","0","0","1","1","0","1",
             "1","0","1","0","0","1","1","0",
             "0","1","0","1","1","0","0","1",
             "1","0","1","0","1","0","1","0",
             "1","0","0","1","0","1","0","1",
             "0","1","1","0","1","0","0","1",
             "1","0","1","1","0","0","1","0",
-            "0","1","0","1","0","1","1","0",
-        ]
-        return board;
+            "0","1","0","1","0","1","1","0",],
+        ];
+
+        return {
+            next: function () {
+                currentBoard = currentBoard + 1;
+                if (currentBoard > boards.length - 1) {
+                    currentBoard = 0;
+                }
+                return boards[currentBoard];
+            }
+        };
     },
     
     generateStartBoard: function (board) {
