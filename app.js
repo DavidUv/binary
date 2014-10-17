@@ -3,7 +3,7 @@ var BI = {
     HARD: 0.9,
     MEDIUM: 0.85,
     // EASY: 0.4,
-    EASY: 0.99,
+    EASY: 0.40,
 
     selectedToken: '',
     selectedDifficulty: null,
@@ -13,6 +13,8 @@ var BI = {
     
     init: function () {
         FastClick.attach(document.body);
+        window.setTimeout(function () { widow.scrollTo(0, 1); }, 0);
+        
         BI.selectedDifficulty = BI.EASY;
         BI.initGrid(BI.GRID_SIDE);
         BI.initControls();
